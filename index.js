@@ -32,13 +32,10 @@ module.exports = ({ ioredisOptions, maxAge, sessionId }) => {
           ctx.cookies.set(sessionId, cookieVal, { maxAge: maxAge * 1000 })
         })
     }
-
-    ctx.$getUserInfo = () => {
-      let cookieVal = ctx.cookies.get(sessionId)
-      if (!cookieVal) {
-        return Promise.reject('cookie value is not exsit!')
-      }
-      return redis.get(cookieVal).then(res => JSON.parse(res))
+    let cookieVal = ctx.cookies.get(sessionId)
+    if (cookieVal) {
+      ctx.$userInfo = await redis.get(cookieVal).then(res => JSON.parse(res))
     }
+    next()
   }
 }
